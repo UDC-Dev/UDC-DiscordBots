@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  bot:
+    build: .
+    volumes:
+      - ./bot:/usr/src/app:rw
+    environment:
+      - TOKEN=${TOKEN}
+    command: ["python3", "pdfbot.py"]
+    tty: true
+  chrome-selenium:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./harfile:/home/harfile
+    tty: true
