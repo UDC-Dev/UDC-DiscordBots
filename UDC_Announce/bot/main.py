@@ -38,9 +38,9 @@ async def announce(mode):
 async def testannounce_morning(done):
     channel = client.get_channel(test_channel_id)
     if done:
-        message="今週は通知済"
+        message="True"
     else:
-        message="今週は未通知"
+        message="False"
     if channel:
         await channel.send("定時連絡(朝)\n"+message)
     return
@@ -48,9 +48,9 @@ async def testannounce_morning(done):
 async def testannounce_evening(done):
     channel = client.get_channel(test_channel_id)
     if done:
-        message="今週は通知済"
+        message="True"
     else:
-        message="今週は未通知"
+        message="False"
     if channel:
         await channel.send("定時連絡(夕方)\n"+message)
     return
@@ -71,8 +71,9 @@ async def check_time():
         day_of_week = current_time.weekday()
         print(f"Day of week: {day_of_week}", file=logfile)
         if days[day_of_week] in [1, 3]:
-            if done and days[day_of_week] == 3:
-                done = False
+            if done:
+                if days[day_of_week] == 3:
+                    done = False
             else:
                 await announce(True)
                 if days[day_of_week] == 3:
