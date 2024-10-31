@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  bot:
+    build: .
+    volumes:
+      - ./bot:/usr/src/app:rw
+    environment:
+      - TOKEN=${TOKEN}
+      - CHANNEL_ID=${CHANNEL_ID}
+    command: ["python3", "main.py"]
+    tty: true
