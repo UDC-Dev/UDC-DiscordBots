@@ -2,4 +2,4 @@
 .venv/
 **/__pycache__/**
 **/uv.lock
-**/secret.py
+UDC_PDFmaker/bot/secret.py
