@@ -6,8 +6,9 @@ from discord.ext import commands
 from dotenv import load_dotenv
 
 load_dotenv()
-
-TOKEN=os.getenv("TOKEN")
+TOKEN = os.getenv("TOKEN")
+GENERATE = int(os.getenv("GENERATE"))
+TEST=int(os.getenv("TEST"))
 
 def is_making():
   if (os.path.isfile(pg.pdf_name)):
@@ -36,6 +37,9 @@ async def test(ctx):
 
 @client.command()
 async def pdfmake(ctx, url: str):
+  if ctx.channel.id not in [TEST,GENERATE]:
+    await ctx.send("専用のチャンネルで実行してください")
+    return
   if (not legal_url(url)):
     print("illegal")
     await ctx.send("urlが不正です")
@@ -46,6 +50,7 @@ async def pdfmake(ctx, url: str):
   await ctx.send("生成中です")
   pg.pdfgene(url=url)
   await ctx.send(file=discord.File(pg.pdf_name))
+  await ctx.send(f"{ctx.author.mention} 生成完了しました")
   pg.rmpdf()
 
 

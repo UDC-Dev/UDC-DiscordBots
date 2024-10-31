@@ -2,7 +2,8 @@
 name = "udc-pdfmaker"
 version = "0.1.0"
 description = "Add your description here"
-requires-python = ">=3.12"
+readme = "README.md"
+requires-python = ">=3.11"
 dependencies = [
     "aiohappyeyeballs==2.4.3",
     "aiohttp==3.10.10",
@@ -11,6 +12,7 @@ dependencies = [
     "certifi==2024.8.30",
     "chardet==5.2.0",
     "charset-normalizer==3.4.0",
+    "chromedriver-binary==129.0.6668.100.0",
     "discord-py==2.4.0",
     "frozenlist==1.4.1",
     "h11==0.14.0",
@@ -23,6 +25,7 @@ dependencies = [
     "propcache==0.2.0",
     "pysocks==1.7.1",
     "python-dotenv==1.0.1",
+    "pytz==2023.3.post1",
     "reportlab==4.2.5",
     "requests==2.32.3",
     "selenium==4.25.0",

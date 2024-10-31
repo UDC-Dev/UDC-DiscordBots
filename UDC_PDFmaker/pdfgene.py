@@ -1,6 +1,8 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+import chromedriver_binary
 import shutil
 import time
 import requests
@@ -10,11 +12,12 @@ import cv2
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import mm
 from reportlab.lib.pagesizes import A4, portrait
+import glob
 
 margin = 0
 margin_tp = 15
+pdf_name="artifact.pdf"
 pics_folder_path = './pics'
-pdf_name = "file.pdf"
 CARDHIGHT = 88
 CARDWIDTH = 63
 card_h = CARDHIGHT
@@ -72,11 +75,13 @@ def pdfgene(url):
   else:
     shutil.rmtree(pics_folder_path)
     os.mkdir(pics_folder_path)
+  service = Service('/usr/bin/chromedriver')
   chrome_options = Options()
   chrome_options.add_argument('--no-sandbox')
   chrome_options.add_argument('--disable-dev-shm-usage')
   chrome_options.add_argument('--headless')
-  driver = webdriver.Chrome(options=chrome_options)
+  chrome_options.add_argument('--no-proxy-server')
+  driver = webdriver.Chrome(service=service, options=chrome_options)
   driver.get(url)
   time.sleep(0.5)
   imgs = driver.find_elements(By.CLASS_NAME, 'item8_img')
@@ -133,5 +138,9 @@ def rmpics():
     shutil.rmtree(pics_folder_path)
 
 def rmpdf():
-  if (os.path.isfile(pdf_name)):
-    os.remove(pdf_name)
+  pdf_files = glob.glob(os.path.join('*.pdf'))
+  for file in pdf_files:
+      try:
+          os.remove(file)
+      except Exception as e:
+          pass
