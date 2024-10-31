@@ -18,16 +18,18 @@ channel_id = int(os.environ.get("CHANNEL_ID"))
 test_channel_id = int(os.environ.get("TEST_CHANNEL_ID"))
 logfile="log.txt"
 
+done=True
+
 @client.event
 async def on_message(message):
     if message.content == "!test":
         if message.channel.id == channel_id or message.channel.id == test_channel_id:
-            await message.channel.send("Announcement Bot is Working!")
+            await message.channel.send(f"Announcement Bot is Working!\nstatus: {done}")
     return
 
-async def announce(mode):
+async def announce():
     channel = client.get_channel(channel_id)
-    if mode:
+    if done:
         message="@everyone\n今日は定例会です！"
     else:
         message="@everyone\n明日は定例会です！"
@@ -35,7 +37,7 @@ async def announce(mode):
         await channel.send(message)
     return
 
-async def testannounce_morning(done):
+async def testannounce_morning():
     channel = client.get_channel(test_channel_id)
     if done:
         message="True"
@@ -45,7 +47,7 @@ async def testannounce_morning(done):
         await channel.send("定時連絡(朝)\n"+message)
     return
 
-async def testannounce_evening(done):
+async def testannounce_evening():
     channel = client.get_channel(test_channel_id)
     if done:
         message="True"
@@ -56,7 +58,7 @@ async def testannounce_evening(done):
     return
 
 async def check_time():
-    done = False
+    global done
     while True:
         # Morning check at 6 AM
         now = datetime.datetime.now()
@@ -64,37 +66,31 @@ async def check_time():
         if now >= next_morning:
             next_morning += datetime.timedelta(days=1)
         seconds_until = (next_morning - now).total_seconds()
-        print(f"Sleep: {seconds_until}", file=logfile)
         await asyncio.sleep(seconds_until)
         current_time = datetime.datetime.now()
-        print(f"Wake up: {current_time}", file=logfile)
         day_of_week = current_time.weekday()
-        print(f"Day of week: {day_of_week}", file=logfile)
         if days[day_of_week] in [1, 3]:
             if done:
                 if days[day_of_week] == 3:
                     done = False
             else:
-                await announce(True)
+                await announce()
                 if days[day_of_week] == 3:
                     done = True
-        await testannounce_morning(done)
+        await testannounce_morning()
         # Evening check at 6 PM
         now = datetime.datetime.now()
         next_evening = now.replace(hour=18, minute=0, second=0, microsecond=0)
         if now >= next_evening:
             next_evening += datetime.timedelta(days=1)
         seconds_until = (next_evening - now).total_seconds()
-        print(f"Sleep: {seconds_until}", file=logfile)
         await asyncio.sleep(seconds_until)
         current_time = datetime.datetime.now()
-        print(f"Wake up: {current_time}", file=logfile)
         day_of_week = current_time.weekday()
-        print(f"Day of week: {day_of_week}", file=logfile)
         if days[day_of_week] in [2, 3]:
             if not done:
-                await announce(False)
-        await testannounce_evening(done)
+                await announce()
+        await testannounce_evening()
 
 @client.event
 async def on_ready():
