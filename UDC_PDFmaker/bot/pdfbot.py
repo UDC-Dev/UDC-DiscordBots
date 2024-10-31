@@ -3,8 +3,10 @@ import os
 import re
 import discord
 from discord.ext import commands
+import secret
 
-TOKEN = os.getenv("TOKEN")
+# TOKEN = os.getenv("TOKEN")
+TOKEN = secret.token
 
 def is_making():
   if (os.path.isfile(pg.pdf_name)):
