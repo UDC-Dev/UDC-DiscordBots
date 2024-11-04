@@ -16,9 +16,8 @@ client = commands.Bot(
 days = [3,1,0,0,0,0,2]
 channel_id = int(os.environ.get("CHANNEL_ID"))
 test_channel_id = int(os.environ.get("TEST_CHANNEL_ID"))
-logfile="log.txt"
 
-done=True
+done=False
 
 @client.event
 async def on_message(message):
