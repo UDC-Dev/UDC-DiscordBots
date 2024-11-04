@@ -16,17 +16,16 @@ client = commands.Bot(
 days = [3,1,0,0,0,0,2]
 channel_id = int(os.environ.get("CHANNEL_ID"))
 test_channel_id = int(os.environ.get("TEST_CHANNEL_ID"))
-
-done=False
+tf=False
 
 @client.event
 async def on_message(message):
     if message.content == "!test":
         if message.channel.id == channel_id or message.channel.id == test_channel_id:
-            await message.channel.send(f"Announcement Bot is Working!\nstatus: {done}")
+            await message.channel.send(f"Announcement Bot is Working!\nstatus: {tf}")
     return
 
-async def announce():
+async def announce(done):
     channel = client.get_channel(channel_id)
     if done:
         message="@everyone\n今日は定例会です！"
@@ -36,7 +35,7 @@ async def announce():
         await channel.send(message)
     return
 
-async def testannounce_morning():
+async def testannounce_morning(done):
     channel = client.get_channel(test_channel_id)
     if done:
         message="True"
@@ -46,7 +45,7 @@ async def testannounce_morning():
         await channel.send("定時連絡(朝)\n"+message)
     return
 
-async def testannounce_evening():
+async def testannounce_evening(done):
     channel = client.get_channel(test_channel_id)
     if done:
         message="True"
@@ -57,7 +56,8 @@ async def testannounce_evening():
     return
 
 async def check_time():
-    global done
+    global tf
+    done=False
     while True:
         # Morning check at 6 AM
         now = datetime.datetime.now()
@@ -73,10 +73,10 @@ async def check_time():
                 if days[day_of_week] == 3:
                     done = False
             else:
-                await announce()
+                await announce(done)
                 if days[day_of_week] == 3:
                     done = True
-        await testannounce_morning()
+        await testannounce_morning(done)
         # Evening check at 6 PM
         now = datetime.datetime.now()
         next_evening = now.replace(hour=18, minute=0, second=0, microsecond=0)
@@ -88,8 +88,9 @@ async def check_time():
         day_of_week = current_time.weekday()
         if days[day_of_week] in [2, 3]:
             if not done:
-                await announce()
-        await testannounce_evening()
+                await announce(done)
+        await testannounce_evening(done)
+        tf=done
 
 @client.event
 async def on_ready():
