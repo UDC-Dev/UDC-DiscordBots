@@ -77,6 +77,7 @@ async def check_time():
                 if days[day_of_week] == 3:
                     done = True
         await testannounce_morning(done)
+        tf=done
         # Evening check at 6 PM
         now = datetime.datetime.now()
         next_evening = now.replace(hour=18, minute=0, second=0, microsecond=0)
@@ -90,7 +91,6 @@ async def check_time():
             if not done:
                 await announce(done)
         await testannounce_evening(done)
-        tf=done
 
 @client.event
 async def on_ready():
