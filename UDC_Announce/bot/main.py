@@ -21,9 +21,9 @@ channel = client.get_channel(channel_id)
 test_channel = client.get_channel(test_channel_id)
 plus=7 #起動時に決める(0/7)
 
-@client.command
+@client.command()
 async def test(ctx):
-    if ctx.id == channel_id or ctx.id == test_channel_id:
+    if ctx.channel.id == channel_id or ctx.channel.id == test_channel_id:
         await ctx.send("Announcement Bot is Working!")
 
 async def announce_tommorow():
