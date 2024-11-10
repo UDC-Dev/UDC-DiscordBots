@@ -17,8 +17,6 @@ today =  [1,0,0,0,0,0,0,0,1,0,0,0,0,0]
 tommorow=[0,0,0,0,0,0,0,1,0,0,0,0,0,1]
 channel_id = int(os.environ.get("CHANNEL_ID"))
 test_channel_id = int(os.environ.get("TEST_CHANNEL_ID"))
-channel = client.get_channel(channel_id)
-test_channel = client.get_channel(test_channel_id)
 
 @client.command()
 async def test(ctx):
@@ -26,15 +24,19 @@ async def test(ctx):
         await ctx.send("Announcement Bot is Working!")
 
 async def announce_tommorow():
+    channel = client.get_channel(channel_id)
     await channel.send("@everyone\n明日は定例会です！")
 
 async def announce_today():
+    channel = client.get_channel(channel_id)
     await channel.send("@everyone\n今日は定例会です！")
 
 async def testannounce_morning():
+    test_channel = client.get_channel(test_channel_id)
     await test_channel.send("定時連絡(朝)")
 
 async def testannounce_evening():
+    test_channel = client.get_channel(test_channel_id)
     await test_channel.send("定時連絡(夜)")
 
 async def check_time():
