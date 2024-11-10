@@ -19,7 +19,6 @@ channel_id = int(os.environ.get("CHANNEL_ID"))
 test_channel_id = int(os.environ.get("TEST_CHANNEL_ID"))
 channel = client.get_channel(channel_id)
 test_channel = client.get_channel(test_channel_id)
-plus=7 #起動時に決める(0/7)
 
 @client.command()
 async def test(ctx):
@@ -39,6 +38,7 @@ async def testannounce_evening():
     await test_channel.send("定時連絡(夜)")
 
 async def check_time():
+    plus=0 #起動時に決める(0/7)
     while True:
         # Morning check at 6 AM
         now = datetime.datetime.now()
@@ -62,6 +62,10 @@ async def check_time():
         if tommorow[day_of_week] == 1:
             await announce_tommorow()
         await testannounce_evening()
+        if day_of_week==13:
+            plus=0
+        elif day_of_week==6:
+            plus=7
 
 @client.event
 async def on_ready():
