@@ -31,6 +31,7 @@ async def announce_today():
     await channel.send("@everyone\n今日は定例会です！")
 
 async def check_task():
+    test_channel = client.get_channel(test_channel_id)
     buf1=datetime.datetime.strptime(today[-1], "%Y-%m-%d").date()
     buf2=datetime.datetime.strptime(tommrow[-1], "%Y-%m-%d").date()
     if datetime.date.today()>buf1 or datetime.date.today()>buf2:
