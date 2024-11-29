@@ -3,6 +3,7 @@ from discord.ext import commands
 import os
 import datetime
 import asyncio
+from schedule import *
 
 TOKEN = os.getenv("TOKEN")
 intent = discord.Intents.default()
@@ -12,9 +13,7 @@ client = commands.Bot(
     command_prefix='!',
     intents=intent
 )
-#月曜が0,日曜が6
-today =  [1,0,0,0,0,0,0,0,1,0,0,0,0,0]
-tommorow=[0,0,0,0,0,0,0,1,0,0,0,0,0,1]
+
 channel_id = int(os.environ.get("CHANNEL_ID"))
 test_channel_id = int(os.environ.get("TEST_CHANNEL_ID"))
 
@@ -31,16 +30,23 @@ async def announce_today():
     channel = client.get_channel(channel_id)
     await channel.send("@everyone\n今日は定例会です！")
 
-async def testannounce_morning(day_of_week):
-    test_channel = client.get_channel(test_channel_id)
-    await test_channel.send(f"定時連絡(朝) {day_of_week}")
+async def check_task():
+    buf1=datetime.datetime.strptime(today[-1], "%Y-%m-%d").date()
+    buf2=datetime.datetime.strptime(tommrow[-1], "%Y-%m-%d").date()
+    if datetime.date.today()>buf1 or datetime.date.today()>buf2:
+        await test_channel.send("日程を追加してください")
 
-async def testannounce_evening(day_of_week):
+async def testannounce_morning():
     test_channel = client.get_channel(test_channel_id)
-    await test_channel.send(f"定時連絡(夜) {day_of_week}")
+    await test_channel.send("定時連絡(朝)")
+    await check_task()
+
+async def testannounce_evening():
+    test_channel = client.get_channel(test_channel_id)
+    await test_channel.send("定時連絡(夜)")
+    await check_task()
 
 async def check_time():
-    plus=7 #起動時に決める(0/7)
     while True:
         # Morning check at 6 AM
         now = datetime.datetime.now()
@@ -52,25 +58,17 @@ async def check_time():
                 next_morning += datetime.timedelta(days=1)
             seconds_until = (next_morning - now).total_seconds()
             await asyncio.sleep(seconds_until)
-            current_time = datetime.datetime.now()
-            day_of_week = (current_time.weekday()+plus)
-            if today[day_of_week] == 1:
+            if str(datetime.date.today()) in today:
                 await announce_today()
-            await testannounce_morning(day_of_week)
+            await testannounce_morning()
         # Evening check at 6 PM
         now = datetime.datetime.now()
         next_evening = now.replace(hour=18, minute=0, second=0, microsecond=0)
         seconds_until = (next_evening - now).total_seconds()
         await asyncio.sleep(seconds_until)
-        current_time = datetime.datetime.now()
-        day_of_week = (current_time.weekday()+plus)
-        if tommorow[day_of_week] == 1:
+        if str(datetime.date.today()) in tommrow:
             await announce_tommorow()
-        await testannounce_evening(day_of_week)
-        if day_of_week==13:
-            plus=0
-        elif day_of_week==6:
-            plus=7
+        await testannounce_evening()
 
 @client.event
 async def on_ready():
