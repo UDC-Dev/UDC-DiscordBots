@@ -3,4 +3,5 @@
 **/__pycache__/**
 **/uv.lock
 UDC_PDFmaker/udcbot.sh
-UDC_PDFmaker/memo.txt
+**/memo.*
+**/test.*
