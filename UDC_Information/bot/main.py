@@ -107,7 +107,7 @@ async def test(ctx):
 async def on_ready():
     print("Bot is ready!")
     while True:
-        asyncio.sleep(60)
+        await asyncio.sleep(60)
         await check_new_video()
         await check_new_article()
 
