@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 
 TOKEN =  os.getenv("TOKEN")
 DISCORD_CHANNEL_ID= int(os.environ.get("DISCORD_CHANNEL_ID"))
+DISCORD_CHANNEL_ID_2= int(os.environ.get("DISCORD_CHANNEL_ID_2"))
 YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
 YOUTUBE_CHANNEL_ID = os.getenv("YOUTUBE_CHANNEL_ID")
 intent = discord.Intents.default()
@@ -17,7 +18,6 @@ client = commands.Bot(
     intents=intent
 )
 
-channel = client.get_channel(DISCORD_CHANNEL_ID)
 # youtubeのapiは一日あたり10000回まで。1分1回で1440回なので余裕
 search_url = f"https://www.googleapis.com/youtube/v3/search?key={YOUTUBE_API_KEY}&channelId={YOUTUBE_CHANNEL_ID}&part=id&order=date"
 denen_url="https://supersolenoid.jp/blog-category-12.html"
@@ -33,6 +33,7 @@ async def get_new_video():
     return video_id
 
 async def check_new_video():
+    channel = client.get_channel(DISCORD_CHANNEL_ID)
     global latest_video
     new_video = await get_new_video()
     if new_video not in latest_video:
@@ -82,9 +83,11 @@ async def check_new_article():
     if new_article not in latest_article:
         latest_article = [new_article]
         if "入賞数ランキング" in article_title:
+            channel = client.get_channel(DISCORD_CHANNEL_ID)
             await channel.send(new_article)
             await channel.send(await ranking_check(new_article))
         elif "結果" in article_title:
+            channel = client.get_channel(DISCORD_CHANNEL_ID)
             result_sentence, names, imgs = await result_check(new_article)
             txt=result_sentence+"\n"
             for name in names:
@@ -93,6 +96,7 @@ async def check_new_article():
             for img in imgs:
                 await channel.send(img)
         elif "が公開" in article_title:
+            channel = client.get_channel(DISCORD_CHANNEL_ID_2)
             newcard_img = await newcard_check(new_article)
             for img in newcard_img:
                 await channel.send(img)
@@ -107,8 +111,7 @@ async def test(ctx):
 async def on_ready():
     print("Bot is ready!")
     while True:
-        await asyncio.sleep(60)
-        await check_new_video()
         await check_new_article()
+        await asyncio.sleep(60)
 
 client.run(TOKEN)
