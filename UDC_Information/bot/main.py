@@ -81,21 +81,21 @@ async def check_new_article():
     new_article, article_title = await get_new_article()
     if new_article not in latest_article:
         latest_article = [new_article]
-    if "入賞数ランキング" in article_title:
-        await channel.send(new_article)
-        await channel.send(await ranking_check(new_article))
-    elif "結果" in article_title:
-        result_sentence, names, imgs = await result_check(new_article)
-        txt=result_sentence+"\n"
-        for name in names:
-            txt+=("\n"+name)
-        await channel.send(txt)
-        for img in imgs:
-            await channel.send(img)
-    elif "が公開" in article_title:
-        newcard_img = await newcard_check(new_article)
-        for img in newcard_img:
-            await channel.send(img)
+        if "入賞数ランキング" in article_title:
+            await channel.send(new_article)
+            await channel.send(await ranking_check(new_article))
+        elif "結果" in article_title:
+            result_sentence, names, imgs = await result_check(new_article)
+            txt=result_sentence+"\n"
+            for name in names:
+                txt+=("\n"+name)
+            await channel.send(txt)
+            for img in imgs:
+                await channel.send(img)
+        elif "が公開" in article_title:
+            newcard_img = await newcard_check(new_article)
+            for img in newcard_img:
+                await channel.send(img)
     return
 
 @client.command()
