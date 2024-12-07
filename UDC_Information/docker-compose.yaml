@@ -11,5 +11,6 @@ services:
       - YOUTUBE_CHANNEL_ID=${YOUTUBE_CHANNEL_ID}
       - DISCORD_CHANNEL_ID=${DISCORD_CHANNEL_ID}
       - DISCORD_CHANNEL_ID_2=${DISCORD_CHANNEL_ID_2}
+      - DISCORD_CHANNEL_ID_3=${DISCORD_CHANNEL_ID_3}
     command: ["python3", "main.py"]
     tty: true

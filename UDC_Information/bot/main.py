@@ -6,8 +6,12 @@ import requests
 from bs4 import BeautifulSoup
 
 TOKEN =  os.getenv("TOKEN")
+# 入賞数ランキング
 DISCORD_CHANNEL_ID= int(os.environ.get("DISCORD_CHANNEL_ID"))
+# 新カード
 DISCORD_CHANNEL_ID_2= int(os.environ.get("DISCORD_CHANNEL_ID_2"))
+# CS結果
+DISCORD_CHANNEL_ID_3= int(os.environ.get("DISCORD_CHANNEL_ID_3"))
 YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
 YOUTUBE_CHANNEL_ID = os.getenv("YOUTUBE_CHANNEL_ID")
 intent = discord.Intents.default()
@@ -24,7 +28,7 @@ denen_url="https://supersolenoid.jp/blog-category-12.html"
 
 # 起動前に更新しておく
 latest_video=["9r13OIuDcTY"]
-latest_article=["https://supersolenoid.jp/blog-entry-40291.html"]
+latest_article=["https://supersolenoid.jp/blog-entry-40547.html"]
 
 async def get_new_video():
     response = requests.get(search_url)
@@ -86,8 +90,8 @@ async def check_new_article():
             channel = client.get_channel(DISCORD_CHANNEL_ID)
             await channel.send(new_article)
             await channel.send(await ranking_check(new_article))
-        elif "結果" in article_title:
-            channel = client.get_channel(DISCORD_CHANNEL_ID)
+        elif "が優勝" in article_title:
+            channel = client.get_channel(DISCORD_CHANNEL_ID_3)
             result_sentence, names, imgs = await result_check(new_article)
             txt=result_sentence+"\n"
             for name in names:
