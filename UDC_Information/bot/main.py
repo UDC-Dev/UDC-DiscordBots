@@ -27,8 +27,8 @@ search_url = f"https://www.googleapis.com/youtube/v3/search?key={YOUTUBE_API_KEY
 denen_url="https://supersolenoid.jp/blog-category-12.html"
 
 # 起動前に更新しておく
-latest_video=["9r13OIuDcTY"]
-latest_article=["https://supersolenoid.jp/blog-entry-40547.html"]
+latest_video="9r13OIuDcTY"
+latest_articles=['https://supersolenoid.jp/blog-entry-40291.html', 'https://supersolenoid.jp/blog-entry-40520.html', 'https://supersolenoid.jp/blog-entry-40550.html', 'https://supersolenoid.jp/blog-entry-40518.html', 'https://supersolenoid.jp/blog-entry-40547.html', 'https://supersolenoid.jp/blog-entry-40546.html', 'https://supersolenoid.jp/blog-entry-40544.html', 'https://supersolenoid.jp/blog-entry-40545.html', 'https://supersolenoid.jp/blog-entry-40548.html', 'https://supersolenoid.jp/blog-entry-40543.html', 'https://supersolenoid.jp/blog-entry-40549.html', 'https://supersolenoid.jp/blog-entry-40542.html', 'https://supersolenoid.jp/blog-entry-40541.html', 'https://supersolenoid.jp/blog-entry-40466.html', 'https://supersolenoid.jp/blog-entry-40540.html']
 
 async def get_new_video():
     response = requests.get(search_url)
@@ -40,16 +40,22 @@ async def check_new_video():
     channel = client.get_channel(DISCORD_CHANNEL_ID)
     global latest_video
     new_video = await get_new_video()
-    if new_video not in latest_video:
+    if new_video != latest_video:
         latest_video = [new_video]
         await channel.send(f"https://www.youtube.com/watch?v={new_video}")
 
-async def get_new_article():
+async def get_new_articles():
     response = requests.get(denen_url)
     soup = BeautifulSoup(response.text, "html.parser")
-    article = soup.find("div",class_="EntryTitle").find("a").get("href")
-    article_title = soup.find("div",class_="EntryTitle").find("a").text
-    return article, article_title
+    article = soup.find_all("div",class_="EntryTitle")
+    articles = []
+    for a in article:
+        articles.append(a.find("a").get("href"))
+    article_title = soup.find_all("div",class_="EntryTitle")
+    article_titles = []
+    for t in article_title:
+        article_titles.append(t.find("a").text)
+    return articles, article_titles
 
 async def ranking_check(new_article):
     response = requests.get(new_article)
@@ -82,28 +88,32 @@ async def newcard_check(new_article):
     return newcard_img
 
 async def check_new_article():
-    global latest_article
-    new_article, article_title = await get_new_article()
-    if new_article not in latest_article:
-        latest_article = [new_article]
-        if "入賞数ランキング" in article_title:
-            channel = client.get_channel(DISCORD_CHANNEL_ID)
-            await channel.send(new_article)
-            await channel.send(await ranking_check(new_article))
-        elif "が優勝" in article_title:
-            channel = client.get_channel(DISCORD_CHANNEL_ID_3)
-            result_sentence, names, imgs = await result_check(new_article)
-            txt=result_sentence+"\n"
-            for name in names:
-                txt+=("\n"+name)
-            await channel.send(txt)
-            for img in imgs:
-                await channel.send(img)
-        elif "が公開" in article_title:
-            channel = client.get_channel(DISCORD_CHANNEL_ID_2)
-            newcard_img = await newcard_check(new_article)
-            for img in newcard_img:
-                await channel.send(img)
+    global latest_articles
+    new_articles, article_titles = await get_new_articles()
+    page_length=len(new_articles)
+    for i in range(page_length):
+        new_article=new_articles[i]
+        article_title=article_titles[i]
+        if new_article not in latest_articles:
+            latest_articles = [new_article]+latest_articles[:page_length-1]
+            if "入賞数ランキング" in article_title:
+                channel = client.get_channel(DISCORD_CHANNEL_ID)
+                await channel.send(new_article)
+                await channel.send(await ranking_check(new_article))
+            elif "が優勝" in article_title:
+                channel = client.get_channel(DISCORD_CHANNEL_ID_3)
+                result_sentence, names, imgs = await result_check(new_article)
+                txt=result_sentence+"\n"
+                for name in names:
+                    txt+=("\n"+name)
+                await channel.send(txt)
+                for img in imgs:
+                    await channel.send(img)
+            elif "が公開" in article_title:
+                channel = client.get_channel(DISCORD_CHANNEL_ID_2)
+                newcard_img = await newcard_check(new_article)
+                for img in newcard_img:
+                    await channel.send(img)
     return
 
 @client.command()
