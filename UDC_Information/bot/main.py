@@ -28,7 +28,16 @@ denen_url="https://supersolenoid.jp/blog-category-12.html"
 
 # 起動前に更新しておく
 latest_video="9r13OIuDcTY"
-latest_articles=['https://supersolenoid.jp/blog-entry-40291.html', 'https://supersolenoid.jp/blog-entry-40520.html', 'https://supersolenoid.jp/blog-entry-40550.html', 'https://supersolenoid.jp/blog-entry-40518.html', 'https://supersolenoid.jp/blog-entry-40547.html', 'https://supersolenoid.jp/blog-entry-40546.html', 'https://supersolenoid.jp/blog-entry-40544.html', 'https://supersolenoid.jp/blog-entry-40545.html', 'https://supersolenoid.jp/blog-entry-40548.html', 'https://supersolenoid.jp/blog-entry-40543.html', 'https://supersolenoid.jp/blog-entry-40549.html', 'https://supersolenoid.jp/blog-entry-40542.html', 'https://supersolenoid.jp/blog-entry-40541.html', 'https://supersolenoid.jp/blog-entry-40466.html', 'https://supersolenoid.jp/blog-entry-40540.html']
+latest_articles=[]
+
+async def ready():
+    global latest_articles
+    response = requests.get(denen_url)
+    soup = BeautifulSoup(response.text, "html.parser")
+    articles = soup.find_all("div",class_="EntryTitle")
+    for a in articles:
+        latest_articles.append(a.find("a").get("href"))
+    print(latest_articles)
 
 async def get_new_video():
     response = requests.get(search_url)
@@ -95,7 +104,7 @@ async def check_new_article():
         new_article=new_articles[i]
         article_title=article_titles[i]
         if new_article not in latest_articles:
-            latest_articles = [new_article]+latest_articles[:page_length-1]
+            latest_articles = [new_article]+latest_articles
             if "入賞数ランキング" in article_title:
                 channel = client.get_channel(DISCORD_CHANNEL_ID)
                 await channel.send(new_article)
@@ -124,6 +133,7 @@ async def test(ctx):
 @client.event
 async def on_ready():
     print("Bot is ready!")
+    await ready()
     while True:
         await check_new_article()
         await asyncio.sleep(60)
