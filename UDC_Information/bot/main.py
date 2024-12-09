@@ -28,7 +28,7 @@ denen_url="https://supersolenoid.jp/blog-category-12.html"
 
 # 起動前に更新しておく
 latest_video="9r13OIuDcTY"
-latest_articles=[]
+latest_articles=['https://supersolenoid.jp/blog-entry-40291.html', 'https://supersolenoid.jp/blog-entry-40585.html', 'https://supersolenoid.jp/blog-entry-40582.html', 'https://supersolenoid.jp/blog-entry-40561.html', 'https://supersolenoid.jp/blog-entry-40559.html', 'https://supersolenoid.jp/blog-entry-40515.html', 'https://supersolenoid.jp/blog-entry-40576.html', 'https://supersolenoid.jp/blog-entry-40575.html', 'https://supersolenoid.jp/blog-entry-40573.html', 'https://supersolenoid.jp/blog-entry-40570.html', 'https://supersolenoid.jp/blog-entry-40567.html', 'https://supersolenoid.jp/blog-entry-40566.html', 'https://supersolenoid.jp/blog-entry-40565.html', 'https://supersolenoid.jp/blog-entry-40562.html']
 
 async def ready():
     global latest_articles
@@ -37,7 +37,6 @@ async def ready():
     articles = soup.find_all("div",class_="EntryTitle")
     for a in articles:
         latest_articles.append(a.find("a").get("href"))
-    print(latest_articles)
 
 async def get_new_video():
     response = requests.get(search_url)
@@ -104,11 +103,11 @@ async def check_new_article():
         new_article=new_articles[i]
         article_title=article_titles[i]
         if new_article not in latest_articles:
-            latest_articles = [new_article]+latest_articles
             if "入賞数ランキング" in article_title:
                 channel = client.get_channel(DISCORD_CHANNEL_ID)
                 await channel.send(new_article)
                 await channel.send(await ranking_check(new_article))
+                latest_articles = [new_article]+latest_articles
             elif "が優勝" in article_title:
                 channel = client.get_channel(DISCORD_CHANNEL_ID_3)
                 result_sentence, names, imgs = await result_check(new_article)
@@ -118,9 +117,12 @@ async def check_new_article():
                 await channel.send(txt)
                 for img in imgs:
                     await channel.send(img)
+                latest_articles = [new_article]+latest_articles
             elif "が公開" in article_title:
                 channel = client.get_channel(DISCORD_CHANNEL_ID_2)
                 newcard_img = await newcard_check(new_article)
+                if newcard_img !=[]:
+                    latest_articles = [new_article]+latest_articles
                 for img in newcard_img:
                     await channel.send(img)
     return
@@ -133,7 +135,7 @@ async def test(ctx):
 @client.event
 async def on_ready():
     print("Bot is ready!")
-    await ready()
+    # await ready()
     while True:
         await check_new_article()
         await asyncio.sleep(60)
