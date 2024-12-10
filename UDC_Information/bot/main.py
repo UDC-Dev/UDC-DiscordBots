@@ -74,8 +74,7 @@ async def ranking_check(new_article):
 async def result_check(new_article):
     response = requests.get(new_article)
     soup = BeautifulSoup(response.text, "html.parser")
-    # <a name="more" id="more"></a>の次のdivタグの中に画像がある
-    result_div = soup.find("a", id="more").find_next("div")
+    result_div = soup.find("div", class_="caption_white")
     # <br> タグを \n に置き換え
     for br in result_div.find_all("br"):
         br.replace_with("\n")
@@ -98,8 +97,13 @@ async def newcard_check(new_article):
 async def hacchi_result(new_article):
     response = requests.get(new_article)
     soup = BeautifulSoup(response.text, "html.parser")
+    result_div = soup.find("div", class_="caption_white").find_next("div")
+    for br in result_div.find_all("br"):
+        br.replace_with("\n")
+    # テキストを取得
+    names = result_div.text
     result_url=soup.find("blockquote",class_="twitter-tweet").find("a").get("href")
-    return result_url
+    return names,result_url
 
 async def check_new_article():
     global latest_articles
@@ -118,14 +122,18 @@ async def check_new_article():
                 channel = client.get_channel(DISCORD_CHANNEL_ID_3)
                 result_sentence, names, imgs = await result_check(new_article)
                 txt=result_sentence+"\n"
-                for name in names:
-                    txt+=("\n"+name)
-                await channel.send(txt)
-                for img in imgs:
-                    await channel.send(img)
                 if "はっち" in article_title:
-                    result_url=hacchi_result(new_article)
-                    await channel.send(result_url)
+                    names,result_url=hacchi_result(new_article)
+                    txt+="\n"
+                    txt+=names
+                    txt+=result_url
+                    await channel.send(txt)
+                else:
+                    for name in names:
+                        txt+=("\n"+name)
+                    await channel.send(txt)
+                    for img in imgs:
+                        await channel.send(img)
                 latest_articles = [new_article]+latest_articles
             elif "が公開" in article_title:
                 channel = client.get_channel(DISCORD_CHANNEL_ID_2)
