@@ -125,7 +125,7 @@ async def check_new_article():
                 result_sentence, names, imgs = await result_check(new_article)
                 txt=result_sentence+"\n"
                 if "はっち" in article_title:
-                    names,result_url=hacchi_result(new_article)
+                    names,result_url=await hacchi_result(new_article)
                     txt+="\n"
                     txt+=names
                     txt+=result_url
