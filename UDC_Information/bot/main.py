@@ -28,7 +28,7 @@ denen_url="https://supersolenoid.jp/blog-category-12.html"
 
 # 起動前に更新しておく
 latest_video="9r13OIuDcTY"
-latest_articles=['https://supersolenoid.jp/blog-entry-40291.html', 'https://supersolenoid.jp/blog-entry-40585.html', 'https://supersolenoid.jp/blog-entry-40582.html', 'https://supersolenoid.jp/blog-entry-40561.html', 'https://supersolenoid.jp/blog-entry-40559.html', 'https://supersolenoid.jp/blog-entry-40515.html', 'https://supersolenoid.jp/blog-entry-40576.html', 'https://supersolenoid.jp/blog-entry-40575.html', 'https://supersolenoid.jp/blog-entry-40573.html', 'https://supersolenoid.jp/blog-entry-40570.html', 'https://supersolenoid.jp/blog-entry-40567.html', 'https://supersolenoid.jp/blog-entry-40566.html', 'https://supersolenoid.jp/blog-entry-40565.html', 'https://supersolenoid.jp/blog-entry-40562.html']
+latest_articles=[]
 
 async def ready():
     global latest_articles
@@ -95,6 +95,12 @@ async def newcard_check(new_article):
     newcard_img = [img.find("img").get("src") for img in newcard if img.find("img") is not None]
     return newcard_img
 
+async def hacchi_result(new_article):
+    response = requests.get(new_article)
+    soup = BeautifulSoup(response.text, "html.parser")
+    result_url=soup.find("blockquote",class_="twitter-tweet").find("a").get("href")
+    return result_url
+
 async def check_new_article():
     global latest_articles
     new_articles, article_titles = await get_new_articles()
@@ -117,6 +123,9 @@ async def check_new_article():
                 await channel.send(txt)
                 for img in imgs:
                     await channel.send(img)
+                if "はっち" in article_title:
+                    result_url=hacchi_result(new_article)
+                    await channel.send(result_url)
                 latest_articles = [new_article]+latest_articles
             elif "が公開" in article_title:
                 channel = client.get_channel(DISCORD_CHANNEL_ID_2)
@@ -135,7 +144,7 @@ async def test(ctx):
 @client.event
 async def on_ready():
     print("Bot is ready!")
-    # await ready()
+    await ready()
     while True:
         await check_new_article()
         await asyncio.sleep(60)
