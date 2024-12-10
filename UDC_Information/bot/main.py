@@ -36,7 +36,9 @@ async def ready():
     soup = BeautifulSoup(response.text, "html.parser")
     articles = soup.find_all("div",class_="EntryTitle")
     for a in articles:
-        latest_articles.append(a.find("a").get("href"))
+        title = a.text
+        if ("入賞数ランキング" in title) or ("が優勝" in title) or ("が公開" in title):
+            latest_articles.append(a.find("a").get("href"))
 
 async def get_new_video():
     response = requests.get(search_url)
