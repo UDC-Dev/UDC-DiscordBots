@@ -139,10 +139,9 @@ async def check_new_article():
             elif "が公開" in article_title:
                 channel = client.get_channel(DISCORD_CHANNEL_ID_2)
                 newcard_img = await newcard_check(new_article)
-                if newcard_img !=[]:
-                    latest_articles = [new_article]+latest_articles
                 for img in newcard_img:
                     await channel.send(img)
+                    latest_articles = [new_article]+latest_articles
     return
 
 @client.command()
