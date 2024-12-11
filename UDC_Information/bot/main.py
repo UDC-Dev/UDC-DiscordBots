@@ -70,7 +70,7 @@ async def get_new_articles():
 async def ranking_check(new_article):
     response = requests.get(new_article)
     soup = BeautifulSoup(response.text, "html.parser")
-    ranking_img = soup.find("div",class_="EntryTitle").find("img").get("src")
+    ranking_img = soup.find("div",class_="EntryBody").find("a").get("href")
     return ranking_img
 
 async def result_check(new_article):
@@ -117,7 +117,6 @@ async def check_new_article():
         if new_article not in latest_articles:
             if "入賞数ランキング" in article_title:
                 channel = client.get_channel(DISCORD_CHANNEL_ID)
-                await channel.send(new_article)
                 await channel.send(await ranking_check(new_article))
                 latest_articles = [new_article]+latest_articles
             elif "が優勝" in article_title:
