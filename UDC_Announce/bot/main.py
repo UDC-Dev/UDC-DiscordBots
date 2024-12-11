@@ -49,7 +49,6 @@ async def testannounce_evening():
 
 async def check_time():
     while True:
-        # Morning check at 6 AM
         now = datetime.datetime.now()
         next_morning = now.replace(hour=6, minute=0, second=0, microsecond=0)
         if 6<=now.hour<18:
@@ -62,7 +61,6 @@ async def check_time():
             if str(datetime.date.today()) in today:
                 await announce_today()
             await testannounce_morning()
-        # Evening check at 6 PM
         now = datetime.datetime.now()
         next_evening = now.replace(hour=18, minute=0, second=0, microsecond=0)
         seconds_until = (next_evening - now).total_seconds()
