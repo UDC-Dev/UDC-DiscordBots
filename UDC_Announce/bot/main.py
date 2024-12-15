@@ -37,16 +37,6 @@ async def check_task():
     if datetime.date.today()>buf1 or datetime.date.today()>buf2:
         await test_channel.send("日程を追加してください")
 
-async def testannounce_morning():
-    test_channel = client.get_channel(test_channel_id)
-    await test_channel.send("定時連絡(朝)")
-    await check_task()
-
-async def testannounce_evening():
-    test_channel = client.get_channel(test_channel_id)
-    await test_channel.send("定時連絡(夜)")
-    await check_task()
-
 async def check_time():
     while True:
         now = datetime.datetime.now()
@@ -60,14 +50,14 @@ async def check_time():
             await asyncio.sleep(seconds_until)
             if str(datetime.date.today()) in today:
                 await announce_today()
-            await testannounce_morning()
+            await check_task()
         now = datetime.datetime.now()
         next_evening = now.replace(hour=18, minute=0, second=0, microsecond=0)
         seconds_until = (next_evening - now).total_seconds()
         await asyncio.sleep(seconds_until)
         if str(datetime.date.today()) in tommrow:
             await announce_tommorow()
-        await testannounce_evening()
+        await check_task()
 
 @client.event
 async def on_ready():
