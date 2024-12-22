@@ -153,7 +153,10 @@ async def test(ctx):
 async def on_ready():
     print("Bot is ready!")
     await ready()
+    # print(latest_articles)
     while True:
+        if len(latest_articles)>15:
+            latest_articles=latest_articles[:15]
         await check_new_article()
         await asyncio.sleep(60)
 
