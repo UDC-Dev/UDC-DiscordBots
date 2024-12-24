@@ -119,6 +119,7 @@ async def check_new_article():
                 channel = client.get_channel(DISCORD_CHANNEL_ID)
                 await channel.send(await ranking_check(new_article))
                 latest_articles = [new_article]+latest_articles
+                print(latest_articles)
             elif "が優勝" in article_title:
                 channel = client.get_channel(DISCORD_CHANNEL_ID_3)
                 result_sentence, names, imgs = await result_check(new_article)
@@ -129,13 +130,16 @@ async def check_new_article():
                     txt+=names
                     txt+=result_url
                     await channel.send(txt)
+                    print(latest_articles)
+                    latest_articles = [new_article]+latest_articles
                 else:
                     for name in names:
                         txt+=("\n"+name)
                     await channel.send(txt)
                     for img in imgs:
                         await channel.send(img)
-                latest_articles = [new_article]+latest_articles
+                    print(latest_articles)
+                    latest_articles = [new_article]+latest_articles
             elif "が公開" in article_title:
                 channel = client.get_channel(DISCORD_CHANNEL_ID_2)
                 newcard_img = await newcard_check(new_article)
@@ -151,6 +155,7 @@ async def test(ctx):
 
 @client.event
 async def on_ready():
+    global latest_articles
     print("Bot is ready!")
     await ready()
     # print(latest_articles)
