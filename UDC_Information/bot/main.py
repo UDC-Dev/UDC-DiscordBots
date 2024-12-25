@@ -30,15 +30,17 @@ denen_url="https://supersolenoid.jp/blog-category-12.html"
 latest_video="9r13OIuDcTY"
 latest_articles=[]
 
-async def ready():
-    global latest_articles
+async def ready(num:int):
+    old_articles=[]
     response = requests.get(denen_url)
     soup = BeautifulSoup(response.text, "html.parser")
     articles = soup.find_all("div",class_="EntryTitle")
     for a in articles:
         title = a.text
         if ("入賞数ランキング" in title) or ("が優勝" in title) or ("が公開" in title):
-            latest_articles.append(a.find("a").get("href"))
+            old_articles.append(a.find("a").get("href"))
+    old_articles=old_articles[num:]
+    return old_articles
 
 async def get_new_video():
     response = requests.get(search_url)
@@ -119,7 +121,6 @@ async def check_new_article():
                 channel = client.get_channel(DISCORD_CHANNEL_ID)
                 await channel.send(await ranking_check(new_article))
                 latest_articles = [new_article]+latest_articles
-                print(latest_articles)
             elif "が優勝" in article_title:
                 channel = client.get_channel(DISCORD_CHANNEL_ID_3)
                 result_sentence, names, imgs = await result_check(new_article)
@@ -130,7 +131,6 @@ async def check_new_article():
                     txt+=names
                     txt+=result_url
                     await channel.send(txt)
-                    print(latest_articles)
                     latest_articles = [new_article]+latest_articles
                 else:
                     for name in names:
@@ -138,7 +138,6 @@ async def check_new_article():
                     await channel.send(txt)
                     for img in imgs:
                         await channel.send(img)
-                    print(latest_articles)
                     latest_articles = [new_article]+latest_articles
             elif "が公開" in article_title:
                 channel = client.get_channel(DISCORD_CHANNEL_ID_2)
@@ -157,8 +156,8 @@ async def test(ctx):
 async def on_ready():
     global latest_articles
     print("Bot is ready!")
-    await ready()
-    # print(latest_articles)
+    latest_articles=await ready(0)
+    print(latest_articles)
     while True:
         if len(latest_articles)>15:
             latest_articles=latest_articles[:15]
