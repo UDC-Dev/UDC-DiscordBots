@@ -57,26 +57,27 @@ async def check_new_video():
         await channel.send(f"https://www.youtube.com/watch?v={new_video}")
 
 async def get_new_articles():
-    response = requests.get(denen_url)
-    soup = BeautifulSoup(response.text, "html.parser")
-    article = soup.find_all("div",class_="EntryTitle")
-    articles = []
-    for a in article:
-        articles.append(a.find("a").get("href"))
-    article_title = soup.find_all("div",class_="EntryTitle")
-    article_titles = []
-    for t in article_title:
-        article_titles.append(t.find("a").text)
-    return articles, article_titles
+    try:
+        response = requests.get(denen_url)
+        soup = BeautifulSoup(response.text, "html.parser")
+        article = soup.find_all("div",class_="EntryTitle")
+        articles = []
+        for a in article:
+            articles.append(a.find("a").get("href"))
+        article_title = soup.find_all("div",class_="EntryTitle")
+        article_titles = []
+        for t in article_title:
+            article_titles.append(t.find("a").text)
+        return articles, article_titles
+    except:
+        return "ERROR","ERROR"
 
-async def ranking_check(new_article):
-    response = requests.get(new_article)
+async def ranking_check(response):
     soup = BeautifulSoup(response.text, "html.parser")
     ranking_img = soup.find("div",class_="EntryBody").find("a").get("href")
     return ranking_img
 
-async def result_check(new_article):
-    response = requests.get(new_article)
+async def result_check(response):
     soup = BeautifulSoup(response.text, "html.parser")
     result_div = soup.find("div", class_="caption_white")
     # <br> タグを \n に置き換え
@@ -91,15 +92,13 @@ async def result_check(new_article):
     imgs = [img.find("img").get("src") for img in result_imgs if img.find("img") is not None]
     return result_sentence, names, imgs
 
-async def newcard_check(new_article):
-    response = requests.get(new_article)
+async def newcard_check(response):
     soup = BeautifulSoup(response.text, "html.parser")
     newcard= soup.find_all("div",class_="card_image")
     newcard_img = [img.find("img").get("src") for img in newcard if img.find("img") is not None]
     return newcard_img
 
-async def hacchi_result(new_article):
-    response = requests.get(new_article)
+async def hacchi_result(response):
     soup = BeautifulSoup(response.text, "html.parser")
     result_div = soup.find("div", class_="caption_white").find_next("div")
     for br in result_div.find_all("br"):
@@ -112,39 +111,45 @@ async def hacchi_result(new_article):
 async def check_new_article():
     global latest_articles
     new_articles, article_titles = await get_new_articles()
+    if new_articles=="ERROR" or article_titles=="ERROR":
+        return
     page_length=len(new_articles)
     for i in range(page_length):
         new_article=new_articles[i]
         article_title=article_titles[i]
         if new_article not in latest_articles:
-            if "入賞数ランキング" in article_title:
-                channel = client.get_channel(DISCORD_CHANNEL_ID)
-                await channel.send(await ranking_check(new_article))
-                latest_articles = [new_article]+latest_articles
-            elif "が優勝" in article_title:
-                channel = client.get_channel(DISCORD_CHANNEL_ID_3)
-                result_sentence, names, imgs = await result_check(new_article)
-                txt=result_sentence+"\n"
-                if "はっち" in article_title:
-                    names,result_url=await hacchi_result(new_article)
-                    txt+="\n"
-                    txt+=names
-                    txt+=result_url
-                    await channel.send(txt)
+            try:
+                response = requests.get(new_article)
+                if "入賞数ランキング" in article_title:
+                    channel = client.get_channel(DISCORD_CHANNEL_ID)
+                    await channel.send(await ranking_check(response))
                     latest_articles = [new_article]+latest_articles
-                else:
-                    for name in names:
-                        txt+=("\n"+name)
-                    await channel.send(txt)
-                    for img in imgs:
+                elif "が優勝" in article_title:
+                    channel = client.get_channel(DISCORD_CHANNEL_ID_3)
+                    result_sentence, names, imgs = await result_check(response)
+                    txt=result_sentence+"\n"
+                    if "はっち" in article_title:
+                        names,result_url=await hacchi_result(response)
+                        txt+="\n"
+                        txt+=names
+                        txt+=result_url
+                        await channel.send(txt)
+                        latest_articles = [new_article]+latest_articles
+                    else:
+                        for name in names:
+                            txt+=("\n"+name)
+                        await channel.send(txt)
+                        for img in imgs:
+                            await channel.send(img)
+                        latest_articles = [new_article]+latest_articles
+                elif "が公開" in article_title:
+                    channel = client.get_channel(DISCORD_CHANNEL_ID_2)
+                    newcard_img = await newcard_check(response)
+                    for img in newcard_img:
                         await channel.send(img)
-                    latest_articles = [new_article]+latest_articles
-            elif "が公開" in article_title:
-                channel = client.get_channel(DISCORD_CHANNEL_ID_2)
-                newcard_img = await newcard_check(new_article)
-                for img in newcard_img:
-                    await channel.send(img)
-                    latest_articles = [new_article]+latest_articles
+                        latest_articles = [new_article]+latest_articles
+            except Exception as e:
+                print(e)
     return
 
 @client.command()
@@ -157,7 +162,7 @@ async def on_ready():
     global latest_articles
     print("Bot is ready!")
     latest_articles=await ready(0)
-    print(latest_articles)
+    # print(latest_articles)
     while True:
         if len(latest_articles)>15:
             latest_articles=latest_articles[:15]
