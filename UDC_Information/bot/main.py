@@ -169,8 +169,8 @@ async def on_ready():
     latest_articles=await ready(0)
     # print(latest_articles)
     while True:
-        if len(latest_articles)>15:
-            latest_articles=latest_articles[:15]
+        if len(latest_articles)>20:
+            latest_articles=latest_articles[:20]
         await check_new_article()
         await asyncio.sleep(60)
 
