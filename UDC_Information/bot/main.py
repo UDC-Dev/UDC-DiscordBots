@@ -110,9 +110,10 @@ async def hacchi_result(response):
 
 async def check_new_article():
     global latest_articles
-    new_articles, article_titles = await get_new_articles()
-    if new_articles=="ERROR" or article_titles=="ERROR":
-        return
+    while True: 
+        new_articles, article_titles = await get_new_articles()
+        if new_articles!="ERROR" and article_titles!="ERROR":
+            break
     page_length=len(new_articles)
     for i in range(page_length):
         new_article=new_articles[i]
@@ -123,7 +124,8 @@ async def check_new_article():
                 if "入賞数ランキング" in article_title:
                     channel = client.get_channel(DISCORD_CHANNEL_ID)
                     await channel.send(await ranking_check(response))
-                    latest_articles = [new_article]+latest_articles
+                    if new_article not in latest_articles:
+                        latest_articles = [new_article]+latest_articles
                 elif "が優勝" in article_title:
                     channel = client.get_channel(DISCORD_CHANNEL_ID_3)
                     result_sentence, names, imgs = await result_check(response)
@@ -134,19 +136,22 @@ async def check_new_article():
                         txt+=names
                         txt+=result_url
                         await channel.send(txt)
-                        latest_articles = [new_article]+latest_articles
+                        if new_article not in latest_articles:
+                            latest_articles = [new_article]+latest_articles
                     else:
                         for name in names:
                             txt+=("\n"+name)
                         await channel.send(txt)
                         for img in imgs:
                             await channel.send(img)
-                        latest_articles = [new_article]+latest_articles
+                        if new_article not in latest_articles:
+                            latest_articles = [new_article]+latest_articles
                 elif "が公開" in article_title:
                     channel = client.get_channel(DISCORD_CHANNEL_ID_2)
                     newcard_img = await newcard_check(response)
                     for img in newcard_img:
                         await channel.send(img)
+                    if new_article not in latest_articles:
                         latest_articles = [new_article]+latest_articles
             except Exception as e:
                 print(e)
