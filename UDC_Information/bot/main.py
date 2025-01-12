@@ -26,7 +26,6 @@ client = commands.Bot(
 search_url = f"https://www.googleapis.com/youtube/v3/search?key={YOUTUBE_API_KEY}&channelId={YOUTUBE_CHANNEL_ID}&part=id&order=date"
 denen_url="https://supersolenoid.jp/blog-category-12.html"
 
-# 起動前に更新しておく
 latest_video="9r13OIuDcTY"
 latest_articles=[]
 
@@ -80,14 +79,11 @@ async def ranking_check(response):
 async def result_check(response):
     soup = BeautifulSoup(response.text, "html.parser")
     result_div = soup.find("div", class_="caption_white")
-    # <br> タグを \n に置き換え
     for br in result_div.find_all("br"):
         br.replace_with("\n")
-    # テキストを取得
     result_sentence = result_div.text
     result_names = soup.find_all("p", class_="dm_deck_name")
     names = [name.text for name in result_names]
-    # 複数の画像を含む <img> 要素を取得
     result_imgs = soup.find_all("div", class_="dm_deck_image")
     imgs = [img.find("img").get("src") for img in result_imgs if img.find("img") is not None]
     return result_sentence, names, imgs
@@ -96,6 +92,12 @@ async def newcard_check(response):
     soup = BeautifulSoup(response.text, "html.parser")
     newcard= soup.find_all("div",class_="card_image")
     newcard_img = [img.find("img").get("src") for img in newcard if img.find("img") is not None]
+    if newcard_img==[]:
+        temp = [img.get("src") for img in soup.find_all("img") if img.get("src") is not None]
+        for t in temp:
+            if "ensc" in t:
+                newcard_img.append(t)
+        newcard_img = [newcard_img[2]]
     return newcard_img
 
 async def hacchi_result(response):
@@ -103,14 +105,13 @@ async def hacchi_result(response):
     result_div = soup.find("div", class_="caption_white").find_next("div")
     for br in result_div.find_all("br"):
         br.replace_with("\n")
-    # テキストを取得
     names = result_div.text
     result_url=soup.find("blockquote",class_="twitter-tweet").find("a").get("href")
     return names,result_url
 
 async def check_new_article():
     global latest_articles
-    while True: 
+    while True:
         new_articles, article_titles = await get_new_articles()
         if new_articles!="ERROR" and article_titles!="ERROR":
             break
@@ -165,9 +166,8 @@ async def test(ctx):
 @client.event
 async def on_ready():
     global latest_articles
-    print("Bot is ready!")
     latest_articles=await ready(0)
-    # print(latest_articles)
+    print(latest_articles)
     while True:
         if len(latest_articles)>20:
             latest_articles=latest_articles[:20]
