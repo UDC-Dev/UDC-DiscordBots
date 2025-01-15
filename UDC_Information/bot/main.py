@@ -36,7 +36,7 @@ async def ready(num:int):
     articles = soup.find_all("div",class_="EntryTitle")
     for a in articles:
         title = a.text
-        if ("入賞数ランキング" in title) or ("が優勝" in title) or ("が公開" in title):
+        if ("入賞数ランキング" in title) or ("結果" in title) or ("が公開" in title):
             old_articles.append(a.find("a").get("href"))
     old_articles=old_articles[num:]
     return old_articles
@@ -127,7 +127,7 @@ async def check_new_article():
                     await channel.send(await ranking_check(response))
                     if new_article not in latest_articles:
                         latest_articles = [new_article]+latest_articles
-                elif "が優勝" in article_title:
+                elif "結果" in article_title:
                     channel = client.get_channel(DISCORD_CHANNEL_ID_3)
                     result_sentence, names, imgs = await result_check(response)
                     txt=result_sentence+"\n"
@@ -169,8 +169,8 @@ async def on_ready():
     latest_articles=await ready(0)
     print(latest_articles)
     while True:
-        if len(latest_articles)>20:
-            latest_articles=latest_articles[:20]
+        if len(latest_articles)>100:
+            latest_articles=latest_articles[:100]
         await check_new_article()
         await asyncio.sleep(60)
 
