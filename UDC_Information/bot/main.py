@@ -93,11 +93,12 @@ async def newcard_check(response):
     newcard= soup.find_all("div",class_="card_image")
     newcard_img = [img.find("img").get("src") for img in newcard if img.find("img") is not None]
     if newcard_img==[]:
-        temp = [img.get("src") for img in soup.find_all("img") if img.get("src") is not None]
-        for t in temp:
-            if "ensc" in t:
-                newcard_img.append(t)
-        newcard_img = [newcard_img[2]]
+        newcard=soup.find("div",class_="EntryMore")
+        tmp = [img.get("src") for img in newcard.find_all("img")]
+        if(len(tmp)>15):
+            newcard_img = tmp[1:-13]
+        else:
+            newcard_img = [tmp[0]]
     return newcard_img
 
 async def hacchi_result(response):
@@ -166,7 +167,7 @@ async def test(ctx):
 @client.event
 async def on_ready():
     global latest_articles
-    latest_articles=await ready(0)
+    latest_articles=await ready(1)
     print(latest_articles)
     while True:
         if len(latest_articles)>100:
