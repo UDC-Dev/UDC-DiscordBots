@@ -28,6 +28,7 @@ denen_url="https://supersolenoid.jp/blog-category-12.html"
 
 latest_video="9r13OIuDcTY"
 latest_articles=[]
+latest_images=[]
 
 async def ready(num:int):
     old_articles=[]
@@ -69,7 +70,7 @@ async def get_new_articles():
             article_titles.append(t.find("a").text)
         return articles, article_titles
     except:
-        return "ERROR","ERROR"
+        return "ERROR","ERROR"  
 
 async def ranking_check(response):
     soup = BeautifulSoup(response.text, "html.parser")
@@ -95,10 +96,10 @@ async def newcard_check(response):
     if newcard_img==[]:
         newcard=soup.find("div",class_="EntryMore")
         tmp = [img.get("src") for img in newcard.find_all("img")]
-        if(len(tmp)>15):
-            newcard_img = tmp[1:-13]
-        else:
-            newcard_img = [tmp[0]]
+        for t in tmp:
+            print(t)
+            if t not in latest_images:
+                newcard_img.append(t)
     return newcard_img
 
 async def hacchi_result(response):
@@ -111,7 +112,7 @@ async def hacchi_result(response):
     return names,result_url
 
 async def check_new_article():
-    global latest_articles
+    global latest_articles, latest_images
     while True:
         new_articles, article_titles = await get_new_articles()
         if new_articles!="ERROR" and article_titles!="ERROR":
@@ -153,11 +154,37 @@ async def check_new_article():
                     newcard_img = await newcard_check(response)
                     for img in newcard_img:
                         await channel.send(img)
+                    latest_images = newcard_img + latest_images
                     if new_article not in latest_articles:
                         latest_articles = [new_article]+latest_articles
             except Exception as e:
                 print(e)
     return
+
+async def ready_images():
+    newcard_img = []
+    while True:
+        new_articles, article_titles = await get_new_articles()
+        if new_articles!="ERROR" and article_titles!="ERROR":
+            break
+    page_length=len(new_articles)
+    for i in range(page_length):
+        new_article=new_articles[i]
+        article_title=article_titles[i]
+        try:
+            response = requests.get(new_article)
+            if "が公開" in article_title:
+                soup = BeautifulSoup(response.text, "html.parser")
+                newcard= soup.find_all("div",class_="card_image")
+                newcard_img = [img.find("img").get("src") for img in newcard if img.find("img") is not None]
+                newcard=soup.find("div",class_="EntryMore")
+                tmp = [img.get("src") for img in newcard.find_all("img")]
+                for t in tmp:
+                    if t not in latest_images and t not in newcard_img:
+                        newcard_img.append(t)
+        except Exception as e:
+            print(e)
+    return newcard_img
 
 @client.command()
 async def test(ctx):
@@ -166,9 +193,11 @@ async def test(ctx):
 
 @client.event
 async def on_ready():
-    global latest_articles
-    latest_articles=await ready(1)
+    global latest_articles, latest_images
+    latest_articles=await ready(0)
+    latest_images=await ready_images()
     print(latest_articles)
+    print(latest_images)
     while True:
         if len(latest_articles)>100:
             latest_articles=latest_articles[:100]
