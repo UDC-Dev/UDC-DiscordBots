@@ -142,11 +142,14 @@ async def check_new_article():
                         if new_article not in latest_articles:
                             latest_articles = [new_article]+latest_articles
                     else:
-                        for name in names:
-                            txt+=("\n"+name)
-                        await channel.send(txt)
-                        for img in imgs:
-                            await channel.send(img)
+                        if "など大会結果" in article_title:
+                            await channel.send(new_article)
+                        else:
+                            for name in names:
+                                txt+=("\n"+name)
+                            await channel.send(txt)
+                            for img in imgs:
+                                await channel.send(img)
                         if new_article not in latest_articles:
                             latest_articles = [new_article]+latest_articles
                 elif "が公開" in article_title:
