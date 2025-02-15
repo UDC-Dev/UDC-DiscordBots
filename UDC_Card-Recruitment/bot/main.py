@@ -241,8 +241,13 @@ async def list(ctx):
         await ctx.send(text)
 @client.command()
 async def test(ctx):
-    if ctx.channel.id == channel_id or ctx.channel.id == test_channel_id:
+    if await check_channel(ctx):
         await ctx.send("Card-Recruitment Bot is Working!")
+@client.command()
+async def save(ctx):
+    if await check_channel(ctx):
+        print(recruitment)
+        print(transaction)
 @client.event
 async def on_ready():
     print("Bot is ready!")
