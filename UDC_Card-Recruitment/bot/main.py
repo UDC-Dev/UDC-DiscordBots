@@ -19,7 +19,7 @@ test_channel_id = int(os.environ.get("TEST_CHANNEL_ID"))
 @client.command()
 async def test(ctx):
     if ctx.channel.id == channel_id or ctx.channel.id == test_channel_id:
-        await ctx.send("Announcement Bot is Working!")
+        await ctx.send("Card-Recruitment Bot is Working!")
 
 @client.event
 async def on_ready():
