@@ -52,12 +52,18 @@ async def guide(ctx):
 @client.command()
 async def want(ctx, *args):
     if await check_channel(ctx):
-        if len(args) == 2:
-            person = ctx.author.display_name
-            want = args[0]
-            num = args[1]
+        foo = len(args)
+        if foo in [2, 3]:
+            if foo == 2:
+                person = ctx.author.display_name
+                want = args[0]
+                num = args[1]
+            else:
+                person = args[0]
+                want = args[1]
+                num = args[2]
             if num.isdecimal():
-                num = int(args[1])
+                num = int(num)
                 if person in recruitment:
                     flag=True
                     for i in range(len(recruitment[person])):
@@ -135,22 +141,27 @@ async def check(ctx, *args):
 @client.command()
 async def end(ctx, *args):
     if await check_channel(ctx):
-        if len(args) == 1:
-            card = args[0]
-            foo = ctx.author.display_name
-            if foo in recruitment:
-                argument = recruitment[foo]
+        foo = len(args)
+        if foo in [1,2]:
+            if foo == 1:
+                bar = ctx.author.display_name
+                card = args[0]
+            else:
+                bar = args[0]
+                card = args[1]
+            if bar in recruitment:
+                argument = recruitment[bar]
                 flag = True
                 for wanted in argument:
                     if wanted["want"] == card:
                         wanted["active"] = False
                         wanted["num"] = 0
                         flag = False
-                    await ctx.send(f"{foo}さんが「{card}」 の募集を終了しました。")
+                    await ctx.send(f"{bar}さんが「{card}」 の募集を終了しました。")
                 if flag:
-                    await ctx.send(f"{foo}さんは「{card}」 を募集していません。")
+                    await ctx.send(f"{bar}さんは「{card}」 を募集していません。")
             else:
-                await ctx.send(f"{foo}さんが募集しているカードはありません。")
+                await ctx.send(f"{bar}さんが募集しているカードはありません。")
         else:
             await ctx.send("募集終了方法に誤りがあります。")
 @client.command()
