@@ -7,5 +7,5 @@ services:
     environment:
       - TOKEN=${TOKEN}
       - CHANNEL_ID=${CHANNEL_ID}
-    command: ["python3", "main.py"]
+    command: ["python3", "card-mining.py"]
     tty: true

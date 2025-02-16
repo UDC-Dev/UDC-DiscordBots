@@ -9,5 +9,5 @@ services:
       - TOKEN=${TOKEN}
       - CHANNEL_ID=${CHANNEL_ID}
       - TEST_ID=${TEST_ID}
-    command: ["python3", "main.py"]
+    command: ["python3", "matching.py"]
     tty: true
