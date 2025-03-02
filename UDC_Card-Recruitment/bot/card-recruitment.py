@@ -157,9 +157,10 @@ async def end(ctx, *args):
                         wanted["active"] = False
                         wanted["num"] = 0
                         flag = False
-                await ctx.send(f"{bar}さんが「{card}」 の募集を終了しました。")
                 if flag:
                     await ctx.send(f"{bar}さんは「{card}」 を募集していません。")
+                else:
+                    await ctx.send(f"{bar}さんが「{card}」 の募集を終了しました。")
             else:
                 await ctx.send(f"{bar}さんが募集しているカードはありません。")
         else:
