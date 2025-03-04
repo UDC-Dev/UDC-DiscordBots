@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import os
+from save import *
 
 # 初期設定
 TOKEN = os.getenv("TOKEN")
@@ -12,12 +13,6 @@ client = commands.Bot(
 )
 channel_id = int(os.environ.get("CHANNEL_ID"))
 test_channel_id = int(os.environ.get("TEST_CHANNEL_ID"))
-
-# データ構造
-recruitment = {}
-# {person: [{want:str, num:int, active:bool}]}
-transaction = {}
-# {transaction-number: {person-from:str, person-to:str, card:str, num:int, active:bool}}
 
 async def check_channel(ctx):
     if ctx.channel.id == channel_id or ctx.channel.id == test_channel_id:
@@ -247,6 +242,7 @@ async def test(ctx):
 @client.command()
 async def save(ctx):
     if await check_channel(ctx):
+        await ctx.send("現時点での内容をセーブしました。")
         print(recruitment)
         print(transaction)
 @client.event
