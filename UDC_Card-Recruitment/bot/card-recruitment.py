@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import os
+import asyncio
 from save_list import *
 
 # 初期設定
@@ -13,6 +14,7 @@ client = commands.Bot(
 )
 channel_id = int(os.environ.get("CHANNEL_ID"))
 test_channel_id = int(os.environ.get("TEST_CHANNEL_ID"))
+log_channel_id = int(os.environ.get("LOG_CHANNEL_ID"))
 
 async def check_channel(ctx):
     if ctx.channel.id == channel_id or ctx.channel.id == test_channel_id:
@@ -169,9 +171,14 @@ async def test(ctx):
 async def save(ctx):
     if await check_channel(ctx):
         await ctx.send("現時点での内容をセーブしました。")
-        print(recruitment)
+        channel = client.get_channel(log_channel_id)
+        await channel.send(f'```\n{recruitment}\n```')
 @client.event
 async def on_ready():
+    channel = client.get_channel(log_channel_id)
     print("Bot is ready!")
+    while True:
+        await asyncio.sleep(900)
+        await channel.send(f'{recruitment}')
 
 client.run(TOKEN)
