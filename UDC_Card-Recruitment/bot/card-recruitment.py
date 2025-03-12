@@ -179,6 +179,6 @@ async def on_ready():
     print("Bot is ready!")
     while True:
         await asyncio.sleep(900)
-        await channel.send(f'{recruitment}')
+        await channel.send(f'```\n{recruitment}\n```')
 
 client.run(TOKEN)
