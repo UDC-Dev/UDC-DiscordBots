@@ -22,7 +22,7 @@ async def test(ctx):
     if ctx.channel.id == channel_id or ctx.channel.id == test_channel_id:
         await ctx.send("Announcement Bot is Working!")
 
-async def announce_tommorow():
+async def announce_tomorrow():
     channel = client.get_channel(channel_id)
     await channel.send("@everyone\n明日は定例会です！")
 
@@ -55,8 +55,8 @@ async def check_time():
         next_evening = now.replace(hour=18, minute=0, second=0, microsecond=0)
         seconds_until = (next_evening - now).total_seconds()
         await asyncio.sleep(seconds_until)
-        if str(datetime.date.today()) in tommrow:
-            await announce_tommorow()
+        if str(datetime.date.today()) in tomorrow:
+            await announce_tomorrow()
         await check_task()
 
 @client.event
