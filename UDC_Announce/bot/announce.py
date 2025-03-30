@@ -10,7 +10,7 @@ intent = discord.Intents.default()
 intent.message_content= True
 
 client = commands.Bot(
-    command_prefix='!',
+    command_prefix='~',
     intents=intent
 )
 
@@ -33,7 +33,7 @@ async def announce_today():
 async def check_task():
     test_channel = client.get_channel(test_channel_id)
     buf1=datetime.datetime.strptime(today[-1], "%Y-%m-%d").date()
-    buf2=datetime.datetime.strptime(tommrow[-1], "%Y-%m-%d").date()
+    buf2=datetime.datetime.strptime(tomorrow[-1], "%Y-%m-%d").date()
     if datetime.date.today()>buf1 or datetime.date.today()>buf2:
         await test_channel.send("日程を追加してください")
 
