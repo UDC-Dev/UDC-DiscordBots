@@ -173,12 +173,23 @@ async def save(ctx):
         await ctx.send("現時点での内容をセーブしました。")
         channel = client.get_channel(log_channel_id)
         await channel.send(f'```\n{recruitment}\n```')
+async def send_log():
+    channel = client.get_channel(log_channel_id)
+    buffa = {}
+    for key in recruitment:
+        for i in range(len(recruitment[key])):
+            if recruitment[key][i]["active"]:
+                if key in buffa:
+                    buffa[key].append([recruitment[key][i]["want"], recruitment[key][i]["num"]])
+                else:
+                    buffa[key] = [[recruitment[key][i]["want"], recruitment[key][i]["num"]]]
+    await channel.send(f'```\n{buffa}\n```')
 @client.event
 async def on_ready():
     channel = client.get_channel(log_channel_id)
     print("Bot is ready!")
     while True:
         await asyncio.sleep(900)
-        await channel.send(f'```\n{recruitment}\n```')
+        await send_log()
 
 client.run(TOKEN)
