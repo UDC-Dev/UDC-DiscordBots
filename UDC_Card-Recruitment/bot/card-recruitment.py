@@ -180,10 +180,11 @@ async def send_log():
         for i in range(len(recruitment[key])):
             if recruitment[key][i]["active"]:
                 if key in buffa:
-                    buffa[key].append([recruitment[key][i]["want"], recruitment[key][i]["num"]])
+                    buffa[key].append({'want': recruitment[key][i]["want"], 'num': recruitment[key][i]["num"], 'active': True})
                 else:
-                    buffa[key] = [[recruitment[key][i]["want"], recruitment[key][i]["num"]]]
-    await channel.send(f'```\n{buffa}\n```')
+                    buffa[key] = [{'want': recruitment[key][i]["want"], 'num': recruitment[key][i]["num"], 'active': True}]
+    recruitment = buffa
+    await channel.send(f'```\n{recruitment}\n```')
 @client.event
 async def on_ready():
     channel = client.get_channel(log_channel_id)
