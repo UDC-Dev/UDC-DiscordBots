@@ -168,21 +168,22 @@ async def test(ctx):
     if await check_channel(ctx):
         await ctx.send("Card-Recruitment Bot is Working!")
 async def send_log():
+    global recruitment
     channel = client.get_channel(log_channel_id)
-    buffa = {}
-    for key in recruitment:
-        for i in range(len(recruitment[key])):
-            if recruitment[key][i]["active"]:
-                if key in buffa:
-                    buffa[key].append({'want': recruitment[key][i]["want"], 'num': recruitment[key][i]["num"], 'active': True})
-                else:
-                    buffa[key] = [{'want': recruitment[key][i]["want"], 'num': recruitment[key][i]["num"], 'active': True}]
+    buffa = {
+        key: [
+            {'want': item["want"], 'num': item["num"], 'active': True}
+            for item in recruitment[key] if item["active"]
+        ]
+        for key in recruitment if any(item["active"] for item in recruitment[key])
+    }
     recruitment = buffa
     await channel.send(f'```\n{recruitment}\n```')
 @client.event
 async def on_ready():
     channel = client.get_channel(log_channel_id)
     print("Bot is ready!")
+    await send_log()
     while True:
         await asyncio.sleep(900)
         await send_log()
