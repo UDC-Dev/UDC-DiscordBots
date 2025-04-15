@@ -183,7 +183,6 @@ async def send_log():
 async def on_ready():
     channel = client.get_channel(log_channel_id)
     print("Bot is ready!")
-    await send_log()
     while True:
         await asyncio.sleep(900)
         await send_log()
