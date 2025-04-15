@@ -167,12 +167,6 @@ async def end(ctx, *args):
 async def test(ctx):
     if await check_channel(ctx):
         await ctx.send("Card-Recruitment Bot is Working!")
-@client.command()
-async def save(ctx):
-    if await check_channel(ctx):
-        await ctx.send("現時点での内容をセーブしました。")
-        channel = client.get_channel(log_channel_id)
-        await channel.send(f'```\n{recruitment}\n```')
 async def send_log():
     channel = client.get_channel(log_channel_id)
     buffa = {}
